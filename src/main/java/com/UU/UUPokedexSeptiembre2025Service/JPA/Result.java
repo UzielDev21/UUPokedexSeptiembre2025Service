@@ -3,7 +3,7 @@ package com.UU.UUPokedexSeptiembre2025Service.JPA;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
-public class ResultJPA {
+public class Result {
     
     public boolean correct;
     public String errorMessage;

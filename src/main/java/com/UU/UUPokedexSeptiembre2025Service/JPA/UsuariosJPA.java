@@ -60,18 +60,18 @@ public class UsuariosJPA {
     @NotNull(message = "No puede ir el id del rol vacio")
     public RolesJPA rolJPA;
 
-    @OneToMany(mappedBy = "UsuarioJPA", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuariosJPA", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     public List<FavoritosJPA> favoritosJPA = new ArrayList<>();
 
-    /*
+/*
 --------------------------------------
     *Este metodo inserta los datos de Active y Is_verified
     *Este metodo es invocado automaticamente para establecer valores por default
     *Active = 1
     *Is_verified = 0
 --------------------------------------    
-     */
+*/
     @PrePersist
     private void PrePersist() {
         active = 1;

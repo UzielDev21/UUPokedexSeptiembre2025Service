@@ -35,7 +35,7 @@ public class LoginRestController {
         this.tokenBlackListService = tokenBlackListService;
     }
     
-    @PostMapping("Login")
+    @PostMapping("/login")
     public ResponseEntity Login(@RequestBody Map<String, String> json) {
         
         Result result = new Result();
@@ -51,6 +51,7 @@ public class LoginRestController {
             
             try {
                 authenticationManager.authenticate(auth);
+                
             } catch (Exception ex) {
                 result.correct = false;
                 result.errorMessage = "Credenciales Invalidas";

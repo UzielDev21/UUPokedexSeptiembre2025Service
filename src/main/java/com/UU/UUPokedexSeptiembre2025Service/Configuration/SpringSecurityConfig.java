@@ -44,7 +44,6 @@ public class SpringSecurityConfig {
     }
 
     //JPRRepository
-    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -52,43 +51,44 @@ public class SpringSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/Login").permitAll()
-                .requestMatchers("/api/Logout").authenticated()
+                .requestMatchers("/api/login").permitAll()
+                .requestMatchers("/api/logout").authenticated()
+                .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsJPAService)
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-    
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsJPAService);
         provider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(provider);
     }
-    
+
     @Bean
-    public JwtAuthFilter jwtAuthFilter(){
+    public JwtAuthFilter jwtAuthFilter() {
         return new JwtAuthFilter(jwtService, userDetailsJPAService, tokenBlackListService, jwtTokenUsoService);
     }
-    
+
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOrigins(List.of("http://localhost:8081"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setExposedHeaders(List.of("Authorization"));
         corsConfiguration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
         corsSource.registerCorsConfiguration("/**", corsConfiguration);
         return corsSource;
     }
-    
+
 }

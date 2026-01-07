@@ -3,7 +3,9 @@ package com.UU.UUPokedexSeptiembre2025Service.Service;
 import java.time.Duration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
+@Service
 public class TokenBlackListService implements ITokenInvalidationService{
 
     private static final String PREFIX_BLACKLIST = "jwt:blacklist:";

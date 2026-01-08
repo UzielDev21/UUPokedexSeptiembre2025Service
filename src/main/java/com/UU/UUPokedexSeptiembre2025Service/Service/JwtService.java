@@ -11,7 +11,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
+@Service
 public class JwtService {
 
     private static final String SECRET_KEY = "UUPokeDexApiSeptiembre2025112205";

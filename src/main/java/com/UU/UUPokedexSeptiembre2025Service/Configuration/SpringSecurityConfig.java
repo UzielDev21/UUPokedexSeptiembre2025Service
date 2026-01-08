@@ -51,6 +51,7 @@ public class SpringSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/pokedex/**").permitAll() // prueba consumo sin token
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers("/api/logout").authenticated()
                 .anyRequest().authenticated()

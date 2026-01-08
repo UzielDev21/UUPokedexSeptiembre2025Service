@@ -36,21 +36,34 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.jwtTokenUsoService = jwtTokenUsoService;
     }
 
+    /*
+        *aqui se indica en que endpoint no se debe de ejecutar el filtro
+        *principalmente para endpoint publicos
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+
+        String path = request.getServletPath();
+        return //endpoint donde se genera el token
+                path.equals("/api/login")
+                //ruta de login form
+                || path.equals("/auth/login")
+                //recursos publicos
+                || path.startsWith("/static.css/")
+                || path.startsWith("/static.js/")
+                //endpoint publicos
+                || path.startsWith("/api/pokedex/");
+    }
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        if (path.equals("/api/login")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String authHeader = request.getHeader("Authorization");
 
+        // Si no hay token, continuar
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -58,6 +71,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
+        // Validar estructura y firma del token
         if (!jwtService.isTokenValid(token)) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token Inválido");
             return;
@@ -67,17 +81,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String username = claims.getSubject();
         String jti = claims.getId();
 
+        // Invalidación de token por logout
         if (tokenBlackListService.isTokenInvalid(jti)) {
 
             response.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED,
                     "Token inhabilitado por logout"
             );
-
-            System.out.println("Token bloqueado por BlackList (Redis): " + jti);
             return;
         }
 
+        // Invalidación por limite de uso del token
         if (jwtTokenUsoService.excedioLimite(jti)) {
 
             tokenBlackListService.invalidateToken(jti);
@@ -88,9 +102,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             return;
         }
-
         jwtTokenUsoService.registrarUso(jti);
 
+        //Autenticación 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);

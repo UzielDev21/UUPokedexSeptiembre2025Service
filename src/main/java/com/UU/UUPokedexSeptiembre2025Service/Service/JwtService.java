@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
-    // HS256 requiere mínimo 32 bytes (256 bits). Tu clave tiene 32 chars, OK.
     private static final String SECRET_KEY = "UUPokeDexApiSeptiembre2025112205";
 
     private Key getSigningKey() {

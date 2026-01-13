@@ -12,7 +12,7 @@ public class TokenBlackListService implements ITokenInvalidationService {
 
     /**
      * Se elimino lo de redis
-     * 
+     * se volvio a implementar el almacenamiento de los token mediante memoria
      */
     @Override
     public void invalidateToken(String jti) {

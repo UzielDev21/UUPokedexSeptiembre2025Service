@@ -16,7 +16,7 @@ public class DataSourceConfig {
 
         try {
 
-            dataSource.setUrl("jdbc:oracle:thin:@192.167.1.11:1521:orcl");
+            dataSource.setUrl("jdbc:oracle:thin:@192.167.0.185:1521:orcl");
             dataSource.setUsername("UUPokedexSeptiembre2025");
             dataSource.setPassword("password1");
             System.out.println("Conexión realizada con exito");

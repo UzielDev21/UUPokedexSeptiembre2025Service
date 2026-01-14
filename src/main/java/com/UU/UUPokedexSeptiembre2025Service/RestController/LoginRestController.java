@@ -108,10 +108,18 @@ public class LoginRestController {
             }
 
             String token = authHeader.substring(7);
-            String jti = jwtService.GetAllClaims(token).getId();
-
+            
+            if (!jwtService.isTokenValid(token)) {
+                result.correct = false;
+                result.errorMessage = "Token invalidado o expirado";
+                result.status = 401;
+                return ResponseEntity.status(result.status).body(result);
+            }
+            
+            String jti = jwtService.getJtiFromToken(token);
             tokenBlackListService.invalidateToken(jti);
             SecurityContextHolder.clearContext();
+            
             result.correct = true;
             result.status = 200;
             result.object = "Logout Exitoso";

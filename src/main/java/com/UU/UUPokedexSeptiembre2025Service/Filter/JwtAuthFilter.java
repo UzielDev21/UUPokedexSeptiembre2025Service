@@ -46,8 +46,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         return //endpoint donde se genera el token
                 path.equals("/api/login")
+                || path.equals("/api/logout")
                 //ruta de login form
                 || path.equals("/auth/login")
+                || path.equals("/auth/logout")
                 //recursos publicos
                 || path.startsWith("/static.css/")
                 || path.startsWith("/static.js/")

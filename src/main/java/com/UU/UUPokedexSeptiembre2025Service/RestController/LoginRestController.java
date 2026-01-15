@@ -5,10 +5,12 @@ import com.UU.UUPokedexSeptiembre2025Service.JPA.Result;
 import com.UU.UUPokedexSeptiembre2025Service.JPA.UsuariosJPA;
 import com.UU.UUPokedexSeptiembre2025Service.Service.JwtService;
 import com.UU.UUPokedexSeptiembre2025Service.Service.TokenBlackListService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,5 +86,47 @@ public class LoginRestController {
         }
         return ResponseEntity.status(result.status).body(result);
     }
-    
+
+    @PostMapping("/logout")
+    public ResponseEntity Logout(HttpServletRequest request) {
+
+        Result result = new Result();
+
+        try {
+
+            String authHeader = request.getHeader("Authorization");
+
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                result.correct = false;
+                result.errorMessage = "No se encontro el token";
+                result.status = 400;
+                return ResponseEntity.status(result.status).body(result);
+            }
+
+            String token = authHeader.substring(7);
+            
+            if (!jwtService.isTokenValid(token)) {
+                result.correct = false;
+                result.errorMessage = "Token invalidado o expirado";
+                result.status = 401;
+                return ResponseEntity.status(result.status).body(result);
+            }
+            
+            String jti = jwtService.getJtiFromToken(token);
+            tokenBlackListService.invalidateToken(jti);
+            SecurityContextHolder.clearContext();
+            
+            result.correct = true;
+            result.status = 200;
+            result.object = "Logout Exitoso";
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+            result.status = 500;
+        }
+        return ResponseEntity.status(result.status).body(result);
+    }
+
 }

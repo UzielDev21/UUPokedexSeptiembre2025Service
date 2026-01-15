@@ -345,7 +345,7 @@ public class PokedexService {
             case "id_asc" ->
                 sortedList.stream().sorted(byIdComparator).toList();
             default ->
-                sortedList.stream().sorted(byIdComparator).toList();  
+                sortedList.stream().sorted(byIdComparator).toList();  // Por defecto: ordenar por ID ascendente
             };
     }
 }

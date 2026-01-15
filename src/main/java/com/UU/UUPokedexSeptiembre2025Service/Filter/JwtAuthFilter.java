@@ -42,6 +42,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        if (path.equals("/api/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -66,7 +73,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     HttpServletResponse.SC_UNAUTHORIZED,
                     "Token inhabilitado por logout"
             );
-            
+
             System.out.println("Token bloqueado por BlackList (Redis): " + jti);
             return;
         }
@@ -78,16 +85,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     HttpServletResponse.SC_UNAUTHORIZED,
                     "Token expirado por limite de uso, Vuelve a iniciar sesión"
             );
-            
+
             return;
         }
-        
+
         jwtTokenUsoService.registrarUso(jti);
-        
+
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            
+
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            
+
             if (!userDetails.isEnabled()) {
                 response.sendError(
                         HttpServletResponse.SC_UNAUTHORIZED,
@@ -95,13 +102,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
                 return;
             }
-            
+
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails,
                     null,
                     userDetails.getAuthorities()
             );
-            
+
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }

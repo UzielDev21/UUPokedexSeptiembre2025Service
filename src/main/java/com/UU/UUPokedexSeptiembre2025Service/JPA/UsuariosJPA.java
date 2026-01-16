@@ -36,6 +36,22 @@ public class UsuariosJPA {
     @Size(min = 6, max = 15, message = "El Username no puede ser menor a 6 digitos ni mayor a 15 digitos")
     private String userName;
 
+    @Column(name = "nombre", nullable = false, length = 50)
+    @NotBlank(message = "No puede ir el nombre vacio")
+    private String nombre;
+
+    @Column(name = "apellidomaterno", nullable = false, length = 50)
+    @NotBlank(message = "No puede ir el apellido paterno vacio")
+    private String apellidoPaterno;
+
+    @Column(name = "apellidopaterno", nullable = false, length = 50)
+    @NotBlank(message = "No puede ir el apellido materno vacio")
+    private String apellidoMaterno;
+
+    @Column(name = "sexo", nullable = false, length = 50)
+    @NotBlank(message = "No puede ir el sexo vacio")
+    private String sexo;
+
     @Column(name = "email", nullable = false, unique = true, length = 120)
     @NotNull(message = "Debes de ingresar un correo obligatoriamente")
     @NotBlank
@@ -64,14 +80,14 @@ public class UsuariosJPA {
     @JsonManagedReference
     public List<FavoritosJPA> favoritosJPA = new ArrayList<>();
 
-/*
+    /*
 --------------------------------------
     *Este metodo inserta los datos de Active y Is_verified
     *Este metodo es invocado automaticamente para establecer valores por default
     *Active = 1
     *Is_verified = 0
 --------------------------------------    
-*/
+     */
     @PrePersist
     private void PrePersist() {
         active = 1;
@@ -155,5 +171,39 @@ public class UsuariosJPA {
     public void setFavoritosJPA(List<FavoritosJPA> favoritosJPA) {
         this.favoritosJPA = favoritosJPA;
     }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
+
+    public String getSexo() {
+        return sexo;
+    }
+
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
+    }
     
+    
+
 }

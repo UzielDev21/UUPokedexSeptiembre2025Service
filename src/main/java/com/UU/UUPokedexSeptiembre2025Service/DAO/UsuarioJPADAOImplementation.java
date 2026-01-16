@@ -1,12 +1,16 @@
 package com.UU.UUPokedexSeptiembre2025Service.DAO;
 
+import com.UU.UUPokedexSeptiembre2025Service.DTO.UsuarioRegisterDTO;
 import com.UU.UUPokedexSeptiembre2025Service.JPA.Result;
 import com.UU.UUPokedexSeptiembre2025Service.JPA.UsuariosJPA;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import java.util.List;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -14,6 +18,9 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 
     @PersistenceContext
     private EntityManager entityManager;
+    
+    @Autowired
+    private ModelMapper modelMapper; 
 
 //-----------------------------------Metodos de Consulta-----------------------------------//    
     /*
@@ -80,26 +87,28 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
 --------------------------------------    
      */
     @Override
-    public Result AddJPA(UsuariosJPA usuariosJPA) {
+    @Transactional
+    public Result AddJPA(UsuarioRegisterDTO usuarioDTO) {
         Result result = new Result();
 
         try {
             TypedQuery<UsuariosJPA> queryUsuario
                     = entityManager.createQuery("FROM UsuariosJPA usuarioJPA "
                             + "WHERE usuarioJPA.userName = :username", UsuariosJPA.class)
-                            .setParameter("username", usuariosJPA.getUserName());
+                            .setParameter("username", usuarioDTO.getUserName());
             List<UsuariosJPA> usuarios = queryUsuario.getResultList();
             
             if (!usuarios.isEmpty()) {
-                throw new EntityExistsException("El username " + usuariosJPA.getUserName() + " ya existe en la base de datos");
+                throw new EntityExistsException("El username " + usuarioDTO.getUserName() + " ya existe en la base de datos");
             }
             
-            if (usuariosJPA.favoritosJPA != null && !usuariosJPA.favoritosJPA.isEmpty()) {
-                usuariosJPA.favoritosJPA.forEach(favoritos -> favoritos.usuariosJPA = usuariosJPA);
-            }
+//            if (usuarioDTO.favoritosJPA != null && !usuarioDTO.favoritosJPA.isEmpty()) {
+//                usuarioDTO.favoritosJPA.forEach(favoritos -> favoritos.usuarioDTO = usuarioDTO);
+//            }
             
-//            String passwordPlano = usuariosJPA.getPassword_Hash();
-            entityManager.persist(usuariosJPA);
+//            String passwordPlano = usuarioDTO.getPassword_Hash();
+            UsuariosJPA usuarioEntity = modelMapper.map(usuarioDTO, UsuariosJPA.class);
+            entityManager.persist(usuarioEntity);
             result.correct = true;
             
         } catch (Exception ex) {

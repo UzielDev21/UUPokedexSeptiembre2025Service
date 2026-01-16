@@ -1,6 +1,7 @@
 package com.UU.UUPokedexSeptiembre2025Service.RestController;
 
 import com.UU.UUPokedexSeptiembre2025Service.DAO.UsuarioJPADAOImplementation;
+import com.UU.UUPokedexSeptiembre2025Service.DTO.UsuarioRegisterDTO;
 import com.UU.UUPokedexSeptiembre2025Service.JPA.Result;
 import com.UU.UUPokedexSeptiembre2025Service.JPA.UsuariosJPA;
 import com.UU.UUPokedexSeptiembre2025Service.Service.EmailVerificationTokenService;
@@ -58,12 +59,12 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity AddUsuario(@RequestBody UsuariosJPA usuariosJPA) {
+    public ResponseEntity AddUsuario(@RequestBody UsuarioRegisterDTO usuarioRegisterDTO) {
 
         Result result = new Result();
 
         try {
-            result = usuarioJPADAOImplementation.AddJPA(usuariosJPA);
+            result = usuarioService.registrarUsuario(usuarioRegisterDTO);
 
             if (result.status == 0) {
 

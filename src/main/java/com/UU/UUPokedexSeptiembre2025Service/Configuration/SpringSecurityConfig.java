@@ -54,6 +54,7 @@ public class SpringSecurityConfig {
                 .requestMatchers("/api/pokedex/**").permitAll() // prueba consumo sin token
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers("/api/logout").permitAll()
+                .requestMatchers("/usuario/registrar").permitAll()
                 .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsJPAService)

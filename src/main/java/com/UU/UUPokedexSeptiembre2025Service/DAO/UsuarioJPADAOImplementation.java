@@ -110,6 +110,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPA {
             UsuariosJPA usuarioEntity = modelMapper.map(usuarioDTO, UsuariosJPA.class);
             entityManager.persist(usuarioEntity);
             result.correct = true;
+            result.object = usuarioEntity;
             
         } catch (Exception ex) {
             result.correct = false;

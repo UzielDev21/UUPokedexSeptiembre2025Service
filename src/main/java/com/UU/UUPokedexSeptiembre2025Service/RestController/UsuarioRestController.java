@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -65,24 +66,8 @@ public class UsuarioRestController {
 
         try {
             result = usuarioService.registrarUsuario(usuarioRegisterDTO);
-
-            if (result.status == 0) {
-
-                if (result.correct) {
-
-                    result.status = 201;
-
-                } else {
-
-                    if (result.ex instanceof EntityExistsException) {
-
-                        result.status = 409;
-
-                    } else {
-                        result.status = 500;
-                    }
-                }
-            }
+            
+            
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getLocalizedMessage();
@@ -91,5 +76,23 @@ public class UsuarioRestController {
         }
         return ResponseEntity.status(result.status).body(result);
     }
-    
+
+    @GetMapping("/verify-account")
+    public ResponseEntity verifyEmail(@RequestParam String tokenEmail) {
+
+        Result result = new Result();
+
+        boolean valid = emailVerificationTokenService.isTokenValid(tokenEmail);
+
+        if (!valid) {
+            result.correct = false;
+            result.status = 400;
+            return ResponseEntity.status(result.status).body(result);
+        }
+        result.correct = true;
+        result.status = 200;
+        result.object = "El email ha sido verificado";
+        return ResponseEntity.status(result.status).body(result);
+    }
+
 }

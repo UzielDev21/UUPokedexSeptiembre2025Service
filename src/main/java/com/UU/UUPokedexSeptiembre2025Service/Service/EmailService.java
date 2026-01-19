@@ -17,7 +17,7 @@ public class EmailService {
     
     public void sendVerificationEmail(String toEmail, String nombre, String tokenEmail) throws MessagingException{
      
-        String verificationLink = "http://localhost:8080:/usuario/verify-account?tokenEmail" + tokenEmail;
+        String verificationLink = "http://localhost:8080:/usuario/verify-account?tokenEmail=" + tokenEmail;
      
         String htmlContent = """
                              <div style="font-family: Arial, Sans-serif; line-height: 1.5;">

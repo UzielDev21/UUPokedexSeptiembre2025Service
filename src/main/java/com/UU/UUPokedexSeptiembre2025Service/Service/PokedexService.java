@@ -60,23 +60,32 @@ public class PokedexService {
      * paginación
      */
     public PokedexResponse load(String searchQuery, String typeFilter, int limit, int offset, String sort) {
-        // Normalizar parámetros de entrada
         searchQuery = (searchQuery == null ? "" : searchQuery.trim().toLowerCase());
         typeFilter = (typeFilter == null ? "" : typeFilter.trim().toLowerCase());
         sort = (sort == null ? "id_asc" : sort.trim().toLowerCase());
 
-        // Caso 1: Búsqueda específica por nombre o ID
+        final String typeFilterFinal = typeFilter;
+
         if (!searchQuery.isBlank()) {
             PokemonDetailDTO pokemonDetail = getPokemonDetailCached(searchQuery);
-            return new PokedexResponse(sortPokes(List.of(toPokemonVista(pokemonDetail)), sort), 1, false, false);
+            PokemonVista vista = toPokemonVista(pokemonDetail);
+
+            if (!typeFilterFinal.isBlank()) {
+                boolean matchesType = vista.types() != null
+                        && vista.types().stream().anyMatch(t -> t.equalsIgnoreCase(typeFilterFinal));
+
+                if (!matchesType) {
+                    throw new java.util.NoSuchElementException("El Pokemon no coincide con el tipo de solicitud");
+                }
+            }
+
+            return new PokedexResponse(sortPokes(List.of(vista), sort), 1, false, false);
         }
 
-        // Caso 2: Filtrado por tipo de Pokémon
-        if (!typeFilter.isBlank()) {
-            return loadType(typeFilter, limit, offset, sort);
+        if (!typeFilterFinal.isBlank()) {
+            return loadType(typeFilterFinal, limit, offset, sort);
         }
 
-        // Caso 3: Listado general paginado
         return loadList(limit, offset, sort);
     }
 
@@ -345,7 +354,7 @@ public class PokedexService {
             case "id_asc" ->
                 sortedList.stream().sorted(byIdComparator).toList();
             default ->
-                sortedList.stream().sorted(byIdComparator).toList();  // Por defecto: ordenar por ID ascendente
-            };
+                sortedList.stream().sorted(byIdComparator).toList();
+        };
     }
 }

@@ -8,6 +8,7 @@ import com.UU.UUPokedexSeptiembre2025Service.Service.UserDetailsJPAService;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,18 +26,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
-
+    
     private final UserDetailsJPAService userDetailsJPAService;
     private final JwtService jwtService;
     private final TokenBlackListService tokenBlackListService;
     private final JwtTokenUsoService jwtTokenUsoService;
-
+    
     public SpringSecurityConfig(
             UserDetailsJPAService userDetailsJPAService,
             JwtService jwtService,
             TokenBlackListService tokenBlackListService,
             JwtTokenUsoService jwtTokenUsoService) {
-
+        
         this.userDetailsJPAService = userDetailsJPAService;
         this.jwtService = jwtService;
         this.tokenBlackListService = tokenBlackListService;
@@ -46,14 +47,16 @@ public class SpringSecurityConfig {
     //JPRRepository
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+        
         http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/pokedex/**").permitAll() // prueba consumo sin token
+                .requestMatchers("/loading/**").permitAll()
+                .requestMatchers("/api/pokedex/**").permitAll()
                 .requestMatchers("/api/login").permitAll()
                 .requestMatchers("/api/logout").permitAll()
+                .requestMatchers("/roles").permitAll()
                 .requestMatchers("/usuario/registrar").permitAll()
                 .anyRequest().authenticated()
                 )
@@ -61,24 +64,24 @@ public class SpringSecurityConfig {
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsJPAService);
         provider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(provider);
     }
-
+    
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
         return new JwtAuthFilter(jwtService, userDetailsJPAService, tokenBlackListService, jwtTokenUsoService);
     }
-
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -87,10 +90,10 @@ public class SpringSecurityConfig {
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setExposedHeaders(List.of("Authorization"));
         corsConfiguration.setAllowCredentials(true);
-
+        
         UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
         corsSource.registerCorsConfiguration("/**", corsConfiguration);
         return corsSource;
     }
-
+    
 }

@@ -18,10 +18,10 @@ public class UsuarioService {
 
     @Autowired
     private EmailVerificationTokenService emailVerificationTokenService;
-    
+
     @Autowired
     private VerificationEmailProducer verificacionEmailProducer;
-    
+
     @Autowired
     private ModelMapper modelMapper;
 
@@ -33,17 +33,17 @@ public class UsuarioService {
         Result result = new Result();
 
         try {
-            
+
             String encryptedPassword = passwordEncoder.encode(usuarioDTO.getPassword_Hash());
             usuarioDTO.setPassword_Hash(encryptedPassword);
             result = usuarioJPADAOImplementation.AddJPA(usuarioDTO);
-            
-            UsuariosJPA usuarioGuardado = (UsuariosJPA)result.object;
+
+            UsuariosJPA usuarioGuardado = (UsuariosJPA) result.object;
             String token = emailVerificationTokenService.generateToken(usuarioGuardado.getUser_Id());
             verificacionEmailProducer.senderVerificationEmail(usuarioGuardado.getEmail(), usuarioGuardado.getNombre(), token);
             result.correct = true;
-            result.status=200;
-            
+            result.status = 200;
+
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getLocalizedMessage();

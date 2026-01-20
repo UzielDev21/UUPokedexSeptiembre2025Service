@@ -46,8 +46,8 @@ public class PokedexRestController {
     @GetMapping("/pokedex")
     public ResponseEntity<PokedexResponse> getPokedex(
             @RequestParam(name = "sear", required = false) String sear,
-            @RequestParam(name = "id", required = false) Integer id,
             @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "id", required = false) Integer id,
             @RequestParam(name = "type", required = false) String typeFilter,
             @RequestParam(defaultValue = "12") int limit,
             @RequestParam(defaultValue = "0") int offset,
@@ -56,18 +56,18 @@ public class PokedexRestController {
         limit = Math.max(1, Math.min(48, limit));
         offset = Math.max(0, offset);
 
-        String searQuery = "";
+        String resolvedSearchQuery = "";
         if (id != null) {
-            searQuery = String.valueOf(id);
+            resolvedSearchQuery = String.valueOf(id);
         } else if (name != null && !name.trim().isBlank()) {
-            searQuery = name.trim();
+            resolvedSearchQuery = name.trim();
         } else if (sear != null && !sear.trim().isBlank()) {
-            searQuery = sear.trim();
+            resolvedSearchQuery = sear.trim();
         }
 
-        String TypeFilter = (typeFilter == null) ? "" : typeFilter.trim();
+        String resolvedTypeFilter = (typeFilter == null) ? "" : typeFilter.trim();
 
-        PokedexResponse response = pokedexService.load(searQuery, TypeFilter, limit, offset, sort);
+        PokedexResponse response = pokedexService.load(resolvedSearchQuery, resolvedTypeFilter, limit, offset, sort);
         return ResponseEntity.ok(response);
     }
 
